@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<include href="track/common/header.html"/>
+<style>
+    body {margin: 10px}
+</style>
+<body>
+<div class="container-fluid">
+    <form id="create">
+    <div class="row">
+        <div class="form-group">
+            <label>code</label>
+            <input type="text" class="form-control" name="code"/>
+            <p class="help-block">只能使用数字或字母，字母不区分大小写</p>
+        </div>
+        <div class="form-group">
+            <label>description</label>
+            <textarea class="form-control" name="description"></textarea>
+            <p class="help-block">如：sns 引流链接</p>
+        </div>
+        <div class="btn-group">
+            <div id="home" class="btn btn-default">首页</div>
+            <div id="submit" class="btn btn-primary">提交</div>
+        </div>
+    </div>
+    </form>
+</div>
+<script>
+    $(function () {
+        $("#home").click(function () {
+            location.href = "{{@BASE}}/track/Index";
+        })
+        $("#submit").click(function () {
+            var code = $("input[name=code]").val();
+            var description = $("textarea[name=description]").val();
+            var rule = /^[0-9a-zA-Z]+$/;
+            if (!rule.test(code)) {
+                alert('输入 code 格式不正确');
+                $("input[name=code]").focus();
+            } else if (!description) {
+                alert('description 不能为空');
+                $("textarea[name=description]").focus();
+            } else {
+                $.post("{{@BASE}}/api/track/check", {code: code})
+                    .done(function (result) {
+                        console.log(result);
+                        var data = JSON.parse(result);
+                        if (data.error.code != 0) {
+                            return alert(data.error.text);
+                        } else {
+                            var form = $("#create");
+                            form.attr("method", "post");
+                            form.submit();
+                        }
+                    })
+                    .fail(function (error) {
+                        console.error(error);
+                        alert('check code failure');
+                    })
+            }
+        })
+    })
+</script>
+</body>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<include href="track/common/header.html"/>
+<style>
+    .container-fluid {padding: 0}
+    .table>thead>tr>th {border-bottom: none}
+    .table td:first-child {font-weight: 500}
+    .create{
+        color: blue;
+        float: right;
+        cursor: pointer;
+    }
+    .pagination {
+        position: fixed;
+        bottom: 0;
+    }
+</style>
+<body>
+<div class="container-fluid">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>code</th>
+            <th>description<span class="create">添加</span></th>
+        </tr>
+        </thead>
+        <repeat group="{{@tracks}}" value="{{@track}}">
+        <tr><td>{{@track['id']}}</td><td>{{@track['code']}}</td><td>{{@track['description']}}</td><td></tr>
+        </repeat>
+    </table>
+</div>
+<ul class="pagination"></ul>
+<script>
+    $(function () {
+        var page = "{{@page['no']}}";
+        var total = "{{@page['total']}}";
+        if (total > 1) {
+            var html = "";
+            for (var i = 1; i <= total; i++) {
+                html += (i == page) ? '<li class="active"><span>' + i + '</span></li>' : '<li><a href="{{@BASE}}/track/Index?page=' + i + '">' + i + '</a></li>';
+            }
+            $(".pagination").append(html);
+            $(".container-fluid").css("margin-bottom", $(".pagination").outerHeight());
+        }
+
+        $(".create").click(function () {
+            location.href = "{{@BASE}}/track/Create";
+        })
+    })
+</script>
+</body>

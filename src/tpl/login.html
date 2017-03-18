@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <script src="{{@BASE}}/lib/jquery-3.1.1.min.js"></script>
+    <link href="{{@BASE}}/lib/bootstrap-3.3.7.min.css" rel="stylesheet"/>
+    <style>
+        .login {
+            text-align: center;
+        }
+        .input {
+            margin: 2% auto;
+        }
+        .input>span {
+            width: 80px;
+            display: inline-block;
+            text-align: right;
+            padding-right: 1%;
+        }
+        .input>input {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="login">
+        <div class="input"><span>用户名</span><input id="username" name="username" type="text"/></div>
+        <div class="input"><span>密码</span><input id="password" name="password" type="password"/></div>
+        <div class="btn-group"><div class="btn clear">清除</div><div class="btn btn-primary submit">提交</div></div>
+    </div>
+</div>
+<script src="{{@BASE}}/js/common.js"></script>
+<script>
+    $(function () {
+        $(".login").css('margin-top', ($(window).height() - $(".login").height())/2);
+        $(".btn-group").css('margin-right', $(".btn-group").width() - 280);
+        $(".clear").click(function () {
+            $("input").val('');
+        });
+        $(".submit").click(function () {
+            var username = $("#username").val().trim();
+            var password = $("#password").val().trim();
+            if (!username) {
+                alert("用户名不能为空");
+                return $("#username").focus();
+            } else if (!password) {
+                alert("密码不能为空");
+                return $("#password").focus();
+            }
+            $.post(location.href, {username: username, password: password})
+                .done(function (data) {
+                    console.log(data)
+                    var json = JSON.parse(data);
+                    if (json.error.code === 0) {
+                        var target = getCookie("target");
+                        location.href = target;
+                    } else {
+                        alert(json.error.text);
+                    }
+                })
+                .fail(function (e) {
+                    console.log("readyState: " + e.readyState);
+                    console.log(e.responseText);
+                    alert(e.responseText);
+                })
+        })
+    })
+</script>
+</body>
+</html>

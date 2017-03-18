@@ -1,0 +1,7 @@
+# runtime
+/data
+/src/log
+
+# settings
+/php.ini
+/src/cfg/local.ini
