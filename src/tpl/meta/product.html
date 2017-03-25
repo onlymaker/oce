@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+<include href="track/common/header.html"/>
+<style>
+    .container-fluid {padding: 0}
+    .table>thead>tr>th {border-bottom: none}
+    .table td:first-child {font-weight: 500}
+</style>
+<body>
+<div class="container-fluid">
+    <ul class="nav nav-pills">
+        <li><a>Attribute</a></li>
+        <li><a>Category</a></li>
+        <li><a>Filter</a></li>
+        <li><a>Option</a></li>
+    </ul>
+    <table class="table table-striped"></table>
+</div>
+<ul class="pagination"></ul>
+<script>
+    $(function () {
+        $("ul li a").click(function () {
+            $("ul li").removeClass("active");
+            $(this).addClass("active");
+            var name = $(this).text().toLowerCase();
+            $.get("{{@BASE}}/api/meta/product?name=" + name)
+                .done(function (data) {
+                    console.log(data);
+                    data = JSON.parse(data);
+                    if (data.error.code) {
+                        alert(data.error.text);
+                    } else {
+                        delete data['error'];
+                        $("table").empty();
+                        if (!!data[0]) {
+                            var html = "<thead>";
+                            for(var key in data['0']) {
+                                html += "<td>" + key + "</td>";
+                            }
+                            html += "</thead>";
+                            for(var i in data) {
+                                html += "<tr>";
+                                for(var key in data[i]) {
+                                    html += "<td>" + data[i][key] + "</td>";
+                                }
+                                html += "</tr>";
+                            }
+                            $("table").append(html);
+                        } else {
+                            $("table").append("<thead><td>No data</td></thead>");
+                        }
+                    }
+                })
+                .fail(console.error)
+        })
+    })
+</script>
+</body>

@@ -7,6 +7,7 @@ class Index extends AppBase
 {
     function get($f3)
     {
-        $f3->reroute('track/Index');
+        $f3->set('title', 'Nav');
+        echo \Template::instance()->render('index.html');
     }
 }

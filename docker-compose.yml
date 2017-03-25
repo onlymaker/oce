@@ -4,7 +4,7 @@ services:
         image: memcached:1.4.35-alpine
         restart: always
     default:
-        image: registry.aliyuncs.com/syncxplus/php:7.1.2
+        image: registry.aliyuncs.com/syncxplus/php:7.1.3
         restart: always
         ports:
             - "80:80"

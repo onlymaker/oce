@@ -7,7 +7,7 @@ class AppBase
 {
     use Url;
 
-    protected $error = ['code' => -1, 'text' => 'Unknown error'];
+    protected $error = ['code' => -1, 'text' => 'Undefined'];
     protected $db = null;
 
     function beforeRoute($f3)
@@ -26,7 +26,7 @@ class AppBase
 
     function jsonResponse($data = [])
     {
-        if ($this->error->code && $data) {
+        if (!$this->error->code && $data) {
             return json_encode(array_merge(['error' => $this->error], $data), JSON_UNESCAPED_UNICODE);
         } else {
             return json_encode(['error' => $this->error]);
