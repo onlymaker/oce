@@ -17,15 +17,18 @@ class Product extends AppBase
         $data = [];
         switch ($_GET['name']) {
             case 'attribute':
-                $data = $this->db->exec('SELECT attribute_id AS id, name FROM oc_attribute_description ORDER BY name');
+                $data = $this->db->exec('SELECT attribute_id AS id, name FROM oc_attribute_description ORDER BY id');
                 break;
             case 'category':
-                $data = $this->db->exec('SELECT category_id AS id, name FROM oc_category_description ORDER BY name');
+                $data = $this->db->exec('SELECT category_id AS id, name FROM oc_category_description ORDER BY id');
                 break;
             case 'filter':
-                $data = $this->db->exec('SELECT filter_id AS id, name FROM oc_filter_description ORDER BY name');
+                $data = $this->db->exec('SELECT filter_id AS id, name FROM oc_filter_description ORDER BY id');
                 break;
             case 'option':
+                $data = $this->db->exec('SELECT o.option_id AS id, d.name, o.type FROM oc_option o, oc_option_description d WHERE o.option_id=d.option_id ORDER BY id');
+                break;
+            case 'option value':
                 $data = $this->db->exec('SELECT option_id AS id, option_value_id as vid, name FROM oc_option_value_description ORDER BY id, vid');
                 break;
         }
