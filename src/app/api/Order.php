@@ -16,7 +16,7 @@ class Order
 
             $db = Database::mysql();
             $sql = <<<SQL
-SELECT o.order_id, p.order_product_id, p.model, p.price, p.quantity, p.total AS pt, (SELECT ot.value FROM oc_order_total ot WHERE ot.order_id = o.order_id AND ot.code = 'shipping') AS shipping, o.total, o.currency_code AS currency, date_added, shipping_firstname AS firstname, shipping_lastname AS lastname, shipping_address_1 AS address1, shipping_address_2 AS address2, shipping_country AS country, shipping_zone AS zone, shipping_city AS city, shipping_postcode AS postcode, telephone, email, comment FROM oc_order o LEFT JOIN oc_order_product p ON o.order_id = p.order_id WHERE o.order_id in (${orders});
+SELECT o.order_id, p.product_id, p.order_product_id, p.model, p.price, p.quantity, p.total AS pt, (SELECT ot.value FROM oc_order_total ot WHERE ot.order_id = o.order_id AND ot.code = 'shipping') AS shipping, o.total, o.currency_code AS currency, o.currency_value, date_added, shipping_firstname AS firstname, shipping_lastname AS lastname, shipping_address_1 AS address1, shipping_address_2 AS address2, shipping_country AS country, shipping_zone AS zone, shipping_city AS city, shipping_postcode AS postcode, telephone, email, comment FROM oc_order o LEFT JOIN oc_order_product p ON o.order_id = p.order_id WHERE o.order_id in (${orders});
 SQL;
             $results = $db->exec($sql);
 
@@ -47,20 +47,62 @@ SQL;
                 ->setCellValue('Q1', 'Telephone')
                 ->setCellValue('R1', 'Email')
                 ->setCellValue('S1', 'Comment')
-                ->setCellValue('T1', 'Option');
+                ->setCellValue('T1', 'Option')
+                ->setCellValue('U1', 'Image');
 
             $iterator = $objPHPExcel->getActiveSheet()->getRowIterator(1);
 
             foreach ($results as $result) {
-                $options = $db->exec("SELECT * FROM oc_order_option WHERE order_product_id = ${result['order_product_id']}");
-
-                $optionNames = json_encode(array_column($options, 'name'));
+                $options = $db->exec("SELECT product_option_value_id, name, value FROM oc_order_option WHERE order_product_id = ${result['order_product_id']}");
 
                 $optionValueIds = implode(',', array_column($options, 'product_option_value_id'));
 
                 if ($optionValueIds && $db->exec("SHOW COLUMNS FROM oc_product_option_value WHERE field='sub_sku'")) {
-                    $query = $db->exec("SELECT sub_sku FROM oc_product_option_value WHERE product_option_value_id in (${optionValueIds}) AND sub_sku != '' AND sub_sku is not null");
-                    if ($query) $model = $query[0]['sub_sku'];
+                    $query = $db->exec("SELECT product_id, product_option_id, product_option_value_id, sub_sku FROM oc_product_option_value WHERE product_option_value_id in (${optionValueIds}) AND sub_sku != '' AND sub_sku is not null");
+                    if ($query) {
+                        $model = $query[0]['sub_sku'];
+                        $poip = [
+                            'product_id' => $query[0]['product_id'],
+                            'product_option_id' => $query[0]['product_option_id'],
+                            'product_option_value_id' => $query[0]['product_option_value_id'],
+                        ];
+                        $optionImage = $db->exec("SELECT image FROM oc_poip_option_image WHERE product_id=${poip['product_id']} AND product_option_id=${poip['product_option_id']} AND product_option_value_id=${poip['product_option_value_id']} ORDER BY sort_order LIMIT 1");
+                        if ($optionImage) {
+                            $image = $f3->get('ROOT') . '/image/' . $optionImage[0]['image'];
+                        }
+                    }
+                }
+
+                if (!isset($image)) {
+                    list($product) = $db->exec("SELECT image FROM oc_product WHERE product_id=${result['product_id']}");
+                    $image = $product['image'];
+                }
+
+                if (file_exists($image)) {
+                    $info = pathinfo($image);
+                    $thumb = $info['dirname'] . '/' . str_replace($info['extension'], '_thumb' . $info['extension'], $info['basename']);
+                    if (!file_exists($thumb)) {
+                        try{
+                            $img = new \Imagick($image);
+                            $img->stripimage();
+                            $img->setimagecompressionquality(90);
+                            $img->thumbnailimage(100, 100, true);
+                            $img->writeimage($thumb);
+                            $img->destroy();
+                            unset($img);
+                        } catch(\Exception $e) {
+                            $f3->set('UI', $info['dirname']);
+                            $img = new \Image('/' . $info['basename']);
+                            $img->resize(100, 100, false);
+                            $img->dump('jpeg', $thumb);
+                            $img->__destruct();
+                            unset($img);
+                        }
+                    }
+                }
+
+                foreach ($options as &$option) {
+                    unset($option['product_option_value_id']);
                 }
 
                 $iterator->next();
@@ -69,15 +111,15 @@ SQL;
                 $cell->next();
                 $cell->current()->setValue(isset($model) ? $model : $result['model'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['price'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['price'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
                 $cell->current()->setValue($result['quantity'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['pt'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['pt'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['shipping'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['shipping'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['total'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['total'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
                 $cell->current()->setValue($result['currency'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
@@ -99,9 +141,21 @@ SQL;
                 $cell->next();
                 $cell->current()->setValue($result['telephone'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
+                $cell->current()->setValue($result['email'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->next();
                 $cell->current()->setValue($result['comment'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($optionNames)->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue(json_encode($options))->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                if (isset($thumb) && file_exists($thumb)) {
+                    $cell->next();
+                    $objDrawing = new \PHPExcel_Worksheet_Drawing();
+                    $objDrawing->setPath($thumb);
+                    $objDrawing->setHeight(100);
+                    $objDrawing->setCoordinates($cell->current()->getCoordinate());
+                    $objDrawing->getShadow()->setVisible(true);
+                    $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+                    $objPHPExcel->getActiveSheet()->getRowDimension($iterator->current()->getRowIndex())->setRowHeight(100);
+                }
             }
 
             $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
@@ -122,6 +176,9 @@ SQL;
             $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setWidth(25);
 
             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 
