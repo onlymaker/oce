@@ -9,6 +9,7 @@
     "license": "Unlicense",
     "require": {
         "bcosca/fatfree": "3.6.0",
+        "jwage/purl": "0.0.7",
         "nategood/httpful": "0.2.20",
         "phpoffice/phpexcel": "1.8.1",
         "ramsey/uuid": "3.5.1"
