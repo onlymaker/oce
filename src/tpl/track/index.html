@@ -14,6 +14,9 @@
         position: fixed;
         bottom: 0;
     }
+    .input-group-addon {
+        cursor: pointer;
+    }
 </style>
 <body>
 <div class="container-fluid">
@@ -22,11 +25,24 @@
         <tr>
             <th>#</th>
             <th>code</th>
-            <th>description<span class="create">添加</span></th>
+            <th>description</th>
+            <th><span class="create">添加</span></th>
         </tr>
         </thead>
         <repeat group="{{@tracks}}" value="{{@track}}">
-        <tr><td>{{@track['id']}}</td><td>{{@track['code']}}</td><td>{{@track['description']}}</td><td></tr>
+            <tr>
+                <td>{{@track['id']}}</td>
+                <td>{{@track['code']}}</td>
+                <td>{{@track['description']}}</td>
+                <td>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="url">
+                            <div class="input-group-addon" data="{{@track['code']}}">View</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
         </repeat>
     </table>
 </div>
@@ -46,6 +62,16 @@
 
         $(".create").click(function () {
             location.href = "{{@BASE}}/track/Create";
+        })
+
+        $(".input-group-addon").click(function () {
+            var that = $(this);
+            $.get("{{@BASE}}/api/track/build?code=" + that.attr("data") + "&url=" + that.prev().val())
+                .done(function (data) {
+                    if (typeof data === 'string') {
+                        that.prev().val(data);
+                    }
+                })
         })
     })
 </script>
