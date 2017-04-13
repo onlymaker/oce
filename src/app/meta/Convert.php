@@ -43,6 +43,8 @@ class Convert extends AppBase
                 $row->next();
             }
 
+            header('Content-Type: octet-stream');
+            header('Content-Disposition: attachment; filename="products.sql"');
             echo file_get_contents($output);
         } else {
             echo 'failure';
