@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+<include href="common/header.html"/>
+<style>
+    .main, .upload {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .upload {
+        height: 100%;
+        width: 60%;
+    }
+</style>
+<body>
+<div class="main">
+    <div class="upload">
+        <form id="upload-form" enctype="multipart/form-data" method="post">
+            <div class="input-group">
+                <input type="file" class="form-control" name="products"/>
+                <div id="upload" class="input-group-addon">Upload</div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".main").css("height", $(window).height());
+
+        $("#upload").click(function () {
+            if (!$("input[name=products]").val()) {
+                alert("no file");
+            } else {
+                if (confirm("Sure to upload?")) {
+                    $("#upload-form").submit();
+                }
+            }
+        })
+    })
+</script>
+</body>
