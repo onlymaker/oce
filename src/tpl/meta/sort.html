@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <include href="common/header.html"/>
+<link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <style>
     .main, .download, .upload {
         display: flex;
@@ -43,6 +44,7 @@
                 alert("no file");
             } else {
                 if (confirm("Sure to upload?")) {
+                    $("#upload").html("<i class='fa fa-spinner fa-spin'></i>");
                     $.ajax({
                         url: "{{@BASE}}/api/sort/upload",
                         type: "POST",
@@ -53,6 +55,7 @@
                     })
                         .done(function(result) {
                             alert(result);
+                            $("#upload").html("Upload");
                         })
                         .fail(console.log)
                 }
