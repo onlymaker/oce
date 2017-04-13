@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+<include href="common/header.html"/>
+<style>
+    .main, .download, .upload {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .download, .upload {
+        height: 100%;
+        width: 50%;
+    }
+</style>
+<body>
+<div class="main">
+    <div class="download">
+        <button id="download" class="btn btn-primary">Download</button>
+    </div>
+    <div class="upload">
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="input-group">
+                <input type="file" class="form-control" name="sort"/>
+                <div id="upload" class="input-group-addon">Upload</div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".main").css("height", $(window).height());
+
+        $("#download").click(function () {
+            $.get("{{@BASE}}/api/sort/download")
+                .done(function (data) {
+                    window.open("{{@BASE}}" + data);
+                })
+                .fail(console.log)
+        });
+
+        $("#upload").click(function () {
+            if (!$("input[name=sort]").val()) {
+                alert("no file");
+            } else {
+                if (confirm("Sure to upload?")) {
+                    $.ajax({
+                        url: "{{@BASE}}/api/sort/upload",
+                        type: "POST",
+                        cache: false,
+                        data: new FormData(document.getElementById("upload-form")),
+                        contentType: false,
+                        processData: false
+                    })
+                        .done(function(result) {
+                            alert(result);
+                        })
+                        .fail(console.log)
+                }
+            }
+        });
+    })
+</script>
+</body>
