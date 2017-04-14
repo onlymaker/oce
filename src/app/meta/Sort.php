@@ -16,7 +16,7 @@ class Sort extends AppBase
     function download($f3)
     {
         $db = Database::mysql();
-        $results = $db->exec("SELECT product_id, sort_order FROM oc_product WHERE sort_order = 0");
+        $results = $db->exec("SELECT product_id, sort_order FROM oc_product WHERE sort_order != 1000");
 
         $excel = new \PHPExcel();
 
