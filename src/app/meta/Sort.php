@@ -16,7 +16,7 @@ class Sort extends AppBase
     function download($f3)
     {
         $db = Database::mysql();
-        $results = $db->exec("SELECT product_id, sort_order FROM oc_product WHERE sort_order != 1000");
+        $results = $db->exec("SELECT model, sort_order FROM oc_product WHERE sort_order != 1000");
 
         $excel = new \PHPExcel();
 
@@ -26,7 +26,7 @@ class Sort extends AppBase
             ->setDescription("Product Sort Order");
 
         $excel->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'productId')
+            ->setCellValue('A1', 'model')
             ->setCellValue('B1', 'sortOrder');
 
         $iterator = $excel->getActiveSheet()->getRowIterator(1);
@@ -34,7 +34,7 @@ class Sort extends AppBase
         foreach ($results as $result) {
             $iterator->next();
             $cell = $iterator->current()->getCellIterator();
-            $cell->current()->setValue($result['product_id'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+            $cell->current()->setValue($result['model'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
             $cell->next();
             $cell->current()->setValue($result['sort_order'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
         }
@@ -68,10 +68,10 @@ class Sort extends AppBase
 
                 while ($iterator->valid()) {
                     $row = $iterator->current()->getRowIndex();
-                    $productId = $sheet->getCellByColumnAndRow(0, $row);
-                    $sortOrder = $sheet->getCellByColumnAndRow(1, $row) ?? 0;
+                    $model = $sheet->getCellByColumnAndRow(0, $row);
+                    $sortOrder = empty($sheet->getCellByColumnAndRow(1, $row)) ? 0 : $sheet->getCellByColumnAndRow(1, $row);
                     if (!empty($sortOrder)) {
-                        $sqls[] = 'UPDATE oc_product SET sort_order = ' . $sortOrder . ' WHERE product_id = ' . $productId;
+                        $sqls[] = "UPDATE oc_product SET sort_order = '$sortOrder' WHERE model = '$model'";
                     }
                     $iterator->next();
                 }
