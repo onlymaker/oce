@@ -66,10 +66,10 @@
 
         $(".input-group-addon").click(function () {
             var that = $(this);
-            $.get("{{@BASE}}/api/track/build?code=" + that.attr("data") + "&url=" + that.prev().val())
+            $.get("{{@BASE}}/api/track/build?code=" + that.attr("data") + "&url=" + encodeURIComponent(that.prev().val()))
                 .done(function (data) {
                     if (typeof data === 'string') {
-                        that.prev().val(data);
+                        that.prev().val(decodeURIComponent(data));
                     }
                 })
         })
