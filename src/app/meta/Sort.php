@@ -16,7 +16,7 @@ class Sort extends AppBase
     function download($f3)
     {
         $db = Database::mysql();
-        $results = $db->exec("SELECT product_id, sort_order FROM oc_product WHERE sort_order != 0");
+        $results = $db->exec("SELECT product_id, sort_order FROM oc_product WHERE sort_order = 0");
 
         $excel = new \PHPExcel();
 
@@ -53,7 +53,7 @@ class Sort extends AppBase
 
     function upload($f3)
     {
-        $sqls = ['UPDATE oc_product SET sort_order = 0'];
+        $sqls = ['UPDATE oc_product SET sort_order = 1000'];
 
         if (isset($_FILES['sort'])) {
             $file = $f3->get('ROOT') . '/data/product_sort_upload_' . date('Ymd_') . time() . '.xlsx';
@@ -69,7 +69,7 @@ class Sort extends AppBase
                 while ($iterator->valid()) {
                     $row = $iterator->current()->getRowIndex();
                     $productId = $sheet->getCellByColumnAndRow(0, $row);
-                    $sortOrder = $sheet->getCellByColumnAndRow(1, $row);
+                    $sortOrder = $sheet->getCellByColumnAndRow(1, $row) ?? 0;
                     if (!empty($sortOrder)) {
                         $sqls[] = 'UPDATE oc_product SET sort_order = ' . $sortOrder . ' WHERE product_id = ' . $productId;
                     }
