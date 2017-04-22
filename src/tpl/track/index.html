@@ -25,6 +25,9 @@
         <tr>
             <th>#</th>
             <th>code</th>
+            <th>click</th>
+            <th>register</th>
+            <th>payment</th>
             <th>description</th>
             <th><span class="create">添加</span></th>
         </tr>
@@ -33,6 +36,9 @@
             <tr>
                 <td>{{@track['id']}}</td>
                 <td>{{@track['code']}}</td>
+                <td>{{@statistics[@track['id']]['access']}}</td>
+                <td>{{@statistics[@track['id']]['register']}}</td>
+                <td>{{@statistics[@track['id']]['payment']}}</td>
                 <td>{{@track['description']}}</td>
                 <td>
                     <div class="form-group">
