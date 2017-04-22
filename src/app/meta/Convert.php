@@ -21,12 +21,10 @@ class Convert extends AppBase
             $file = $f3->get('ROOT') . '/data/product_list_' . date('Ymd_') . time() . '.xlsx';
             file_put_contents($file, file_get_contents($_FILES['products']['tmp_name']));
 
-            $db = Database::mysql();
-
-            list($query) = $db->exec('SELECT max(product_option_id) as max FROM oc_product_option');
+            list($query) = $this->db->exec('SELECT max(product_option_id) as max FROM oc_product_option');
             $nextProductOptionId = (int)$query['max'] + 1;
 
-            list($query) = $db->exec('SELECT max(product_option_value_id) as max FROM oc_product_option_value');
+            list($query) = $this->db->exec('SELECT max(product_option_value_id) as max FROM oc_product_option_value');
             $nextProductOptionValueId = (int)$query['max'] + 1;
 
             $output = $f3->get('ROOT') . '/data/migrate.sql';

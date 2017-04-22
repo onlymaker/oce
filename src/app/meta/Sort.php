@@ -15,8 +15,7 @@ class Sort extends AppBase
 
     function download($f3)
     {
-        $db = Database::mysql();
-        $results = $db->exec("SELECT model, sort_order FROM oc_product WHERE sort_order != 1000");
+        $results = $this->db->exec("SELECT model, sort_order FROM oc_product WHERE sort_order != 1000");
 
         $excel = new \PHPExcel();
 
@@ -76,7 +75,7 @@ class Sort extends AppBase
                     $iterator->next();
                 }
 
-                Database::mysql()->exec($sqls);
+                $this->db->exec($sqls);
                 echo 'success';
             } catch (\Exception $e) {
                 var_dump($e);
