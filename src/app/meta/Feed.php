@@ -58,16 +58,11 @@ class Feed extends AppBase
                 strip_tags(html_entity_decode($product['description'], ENT_QUOTES, 'UTF-8')),
                 $product['price'],
                 self::PREFIX . 'index.php?route=product/product&product_id=' . $product['id'],
-                self::PREFIX . $product['image']
+                self::PREFIX . $product['image'],
+                implode(';', $this->getProductCategories($product['id'])),
+                implode(';', $this->getProductColors($product['id'])),
+                implode(';', $this->getProductSizes($product['id']))
             ];
-
-            $category = $this->db->exec('SELECT c.name FROM oc_category_description c, oc_product_to_category p WHERE p.product_id = ? AND p.category_id = c.category_id', $product['id']);
-            $data[] = implode(';', array_column($category, 'name'));
-
-            $data[] = ''; // field occupied for color
-
-            $size = $this->db->exec("SELECT n.name FROM oc_product_option_value v, oc_option_description o, oc_option_value_description n WHERE v.product_id = ${product['id']} AND v.option_id = o.option_id AND o.name LIKE 'size%' AND v.option_value_id = n.option_value_id  ORDER by n.name");
-            $data[] = implode(';', array_column($size, 'name'));
 
             $options = $this->getMultiOptionImages($product['id']);
 
@@ -93,6 +88,24 @@ class Feed extends AppBase
         fclose($fp);
 
         \Base::instance()->log($this->db->log());
+    }
+
+    function getProductCategories($id)
+    {
+        $categories = $this->db->exec("SELECT c.name as category FROM oc_category_description c, oc_product_to_category p WHERE p.product_id = $id AND p.category_id = c.category_id");
+        return array_column($categories, 'category');
+    }
+
+    function getProductColors($id)
+    {
+        $color = $this->db->exec("SELECT v.name as color FROM oc_product_option_value p, oc_option_description d, oc_option_value_description v WHERE p.product_id = $id AND d.name = 'color' AND p.option_id = d.option_id AND p.option_value_id = v.option_value_id");
+        return array_column($color, 'color');
+    }
+
+    function getProductSizes($id)
+    {
+        $sizes = $this->db->exec("SELECT v.name as size FROM oc_product_option_value p, oc_option_description d, oc_option_value_description v WHERE p.product_id = $id AND d.name LIKE 'size%' AND p.option_id = d.option_id AND p.option_value_id = v.option_value_id  ORDER by 1");
+        return array_column($sizes, 'size');
     }
 
     function getMultiOptionImages($id)
