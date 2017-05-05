@@ -64,6 +64,8 @@ class Feed extends AppBase
             $category = $this->db->exec('SELECT c.name FROM oc_category_description c, oc_product_to_category p WHERE p.product_id = ? AND p.category_id = c.category_id', $product['id']);
             $data[] = implode(';', array_column($category, 'name'));
 
+            $data[] = ''; // field occupied for color
+
             $size = $this->db->exec("SELECT n.name FROM oc_product_option_value v, oc_option_description o, oc_option_value_description n WHERE v.product_id = ${product['id']} AND v.option_id = o.option_id AND o.name LIKE 'size%' AND v.option_value_id = n.option_value_id  ORDER by n.name");
             $data[] = implode(';', array_column($size, 'name'));
 
