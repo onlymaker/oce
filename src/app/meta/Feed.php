@@ -6,7 +6,7 @@ use app\common\AppBase;
 
 class Feed extends AppBase
 {
-    const PREFIX = 'http://onlymaker.com/';
+    const PREFIX = 'https://onlymaker.com/';
     const HEAD = [
         'id',
         'model',
@@ -16,6 +16,7 @@ class Feed extends AppBase
         'link',
         'image',
         'category',
+        'color',
         'size'
     ];
     private $csv;
@@ -75,6 +76,7 @@ class Feed extends AppBase
                     $sub[$head['id']] .= '-' . $option['sku'];
                     $sub[$head['link']] .= '&poip_ov=' . $option['povId'];
                     $sub[$head['model']] = $option['sku'];
+                    $sub[$head['color']] = $option['color'];
                     $sub[$head['image']] = self::PREFIX . $option['image'];
                     fputcsv($fp, $sub);
                 }
@@ -100,10 +102,11 @@ class Feed extends AppBase
         if (count($data) > 1) {
             foreach ($data as $item) {
                 $povId = $item['product_option_value_id'];
-                list($info) = $this->db->exec("SELECT sub_sku, image FROM oc_product_option_value p, oc_poip_option_image m WHERE p.product_option_value_id = $povId AND p.product_option_value_id = m.product_option_value_id ORDER BY sort_order LIMIT 1");
+                list($info) = $this->db->exec("SELECT name as color, sub_sku as sku, image FROM oc_option_value_description v, oc_product_option_value p, oc_poip_option_image m WHERE v.option_value_id = p.option_value_id AND p.product_option_value_id = $povId AND p.product_option_value_id = m.product_option_value_id ORDER BY sort_order LIMIT 1");
                 $results[] = [
                     'povId' => $povId,
-                    'sku' => $info['sub_sku'],
+                    'color' => $info['color'],
+                    'sku' => $info['sku'],
                     'image' => $info['image']
                 ];
             }
