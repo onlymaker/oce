@@ -58,7 +58,7 @@ class Feed extends AppBase
                 strip_tags(html_entity_decode($product['description'], ENT_QUOTES, 'UTF-8')),
                 $product['price'],
                 self::PREFIX . 'index.php?route=product/product&product_id=' . $product['id'],
-                self::PREFIX . $product['image'],
+                self::PREFIX . 'image/' . $product['image'],
                 implode(';', $this->getProductCategories($product['id'])),
                 implode(';', $this->getProductColors($product['id'])),
                 implode(';', $this->getProductSizes($product['id']))
@@ -74,7 +74,7 @@ class Feed extends AppBase
                     $sub[$head['link']] .= '&poip_ov=' . $option['povId'];
                     $sub[$head['model']] = $option['sku'];
                     $sub[$head['color']] = $option['color'];
-                    $sub[$head['image']] = self::PREFIX . $option['image'];
+                    $sub[$head['image']] = self::PREFIX . 'image/' . $option['image'];
                     fputcsv($fp, $sub);
                 }
             } else {
