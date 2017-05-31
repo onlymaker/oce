@@ -16,7 +16,7 @@ class Order
 
             $db = Database::mysql();
             $sql = <<<SQL
-SELECT o.order_id, p.product_id, p.order_product_id, p.model, p.price, p.quantity, p.total AS pt, (SELECT ot.value FROM oc_order_total ot WHERE ot.order_id = o.order_id AND ot.code = 'shipping') AS shipping, o.total, o.currency_code AS currency, o.currency_value, date_added, shipping_firstname AS firstname, shipping_lastname AS lastname, shipping_address_1 AS address1, shipping_address_2 AS address2, shipping_country AS country, shipping_zone AS zone, shipping_city AS city, shipping_postcode AS postcode, telephone, email, comment FROM oc_order o LEFT JOIN oc_order_product p ON o.order_id = p.order_id WHERE o.order_id in (${orders});
+SELECT o.order_id, p.product_id, p.order_product_id, p.model, p.price, p.quantity, p.total AS pt, (SELECT ot.value FROM oc_order_total ot WHERE ot.order_id = o.order_id AND ot.code = 'shipping') AS shipping, o.total, o.currency_code AS currency, o.currency_value, date_added, shipping_firstname AS firstname, shipping_lastname AS lastname, shipping_company as company, shipping_address_1 AS address1, shipping_address_2 AS address2, shipping_country AS country, shipping_zone AS zone, shipping_city AS city, shipping_postcode AS postcode, telephone, email, comment FROM oc_order o LEFT JOIN oc_order_product p ON o.order_id = p.order_id WHERE o.order_id in (${orders});
 SQL;
             $results = $db->exec($sql);
 
@@ -38,17 +38,18 @@ SQL;
                 ->setCellValue('H1', 'Currency')
                 ->setCellValue('I1', 'Date Added')
                 ->setCellValue('J1', 'Receiver')
-                ->setCellValue('K1', 'Address 1')
-                ->setCellValue('L1', 'Address 2')
-                ->setCellValue('M1', 'Country')
-                ->setCellValue('N1', 'Region/State')
-                ->setCellValue('O1', 'City')
-                ->setCellValue('P1', 'Postcode')
-                ->setCellValue('Q1', 'Telephone')
-                ->setCellValue('R1', 'Email')
-                ->setCellValue('S1', 'Comment')
-                ->setCellValue('T1', 'Option')
-                ->setCellValue('U1', 'Image');
+                ->setCellValue('K1', 'Company')
+                ->setCellValue('L1', 'Address 1')
+                ->setCellValue('M1', 'Address 2')
+                ->setCellValue('N1', 'Country')
+                ->setCellValue('O1', 'Region/State')
+                ->setCellValue('P1', 'City')
+                ->setCellValue('Q1', 'Postcode')
+                ->setCellValue('R1', 'Telephone')
+                ->setCellValue('S1', 'Email')
+                ->setCellValue('T1', 'Comment')
+                ->setCellValue('U1', 'Option')
+                ->setCellValue('V1', 'Image');
 
             $iterator = $objPHPExcel->getActiveSheet()->getRowIterator(1);
 
@@ -127,6 +128,8 @@ SQL;
                 $cell->next();
                 $cell->current()->setValue($result['firstname'] . ' ' . $result['lastname'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
+                $cell->current()->setValue($result['company'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->next();
                 $cell->current()->setValue($result['address1'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
                 $cell->next();
                 $cell->current()->setValue($result['address2'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
@@ -178,7 +181,8 @@ SQL;
             $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setWidth(25);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setWidth(25);
 
             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 
