@@ -81,7 +81,7 @@ SQL;
 
                 if (file_exists($image)) {
                     $info = pathinfo($image);
-                    $thumb = $info['dirname'] . '/' . str_replace($info['extension'], '_thumb' . $info['extension'], $info['basename']);
+                    $thumb = '/tmp/' . str_replace('.' . $info['extension'], '_thumb.' . $info['extension'], $info['basename']);
                     if (!file_exists($thumb)) {
                         try{
                             $img = new \Imagick($image);
