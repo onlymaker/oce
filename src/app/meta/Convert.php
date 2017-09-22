@@ -58,6 +58,10 @@ class Convert extends AppBase
             'description' => 'P',
             'price'       => 'R',
             'quantity'    => 'S',
+            'minimumQty'  => 'T',
+            'subStock'    => 'U',
+            'outOfStock'  => 'V',
+            'shipping'    => 'W',
             'mainImage'   => 'Y',
             'sort'        => 'AH',
             'images'      => 'AQ',
@@ -73,6 +77,11 @@ class Convert extends AppBase
         $description = htmlentities(trim($iterator->seek($field['description'])->current()), ENT_QUOTES);
         $price = (float)trim($iterator->seek($field['price'])->current());
         $quantity = (int)trim($iterator->seek($field['quantity'])->current()) ?? 1000;
+        $minimumQty = (int)trim($iterator->seek($field['minimumQty'])->current());
+        $subStock = (int)trim($iterator->seek($field['subStock'])->current());
+        $outOfStock = (int)trim($iterator->seek($field['outOfStock'])->current());
+        $requiresShipping = (int)trim($iterator->seek($field['shipping'])->current());
+
         $mainImage = htmlentities(trim($iterator->seek($field['mainImage'])->current()), ENT_QUOTES);
         $sort = (int)trim($iterator->seek($field['sort'])->current());
         $images = htmlentities(trim($iterator->seek($field['images'])->current()), ENT_QUOTES);
@@ -86,9 +95,9 @@ class Convert extends AppBase
 #### $id #####
 DELETE FROM oc_product WHERE product_id=$id;
 INSERT INTO oc_product SET product_id=$id, model='$model', sku='', upc='', ean='', jan='', isbn='', mpn='',
-manufacturer_id=11, shipping=1, price=$price, points=$points, quantity=$quantity, minimum=1, stock_status_id=6,
+manufacturer_id=11, shipping=$requiresShipping, price=$price, points=$points, quantity=$quantity, minimum=$minimumQty, stock_status_id=$outOfStock,
 image='$mainImage', weight=1, weight_class_id=1, length=0, width=0, height=0, length_class_id=1, tax_class_id=0,
-location='', status=1, subtract=1, sort_order=$sort, date_available=now(), date_added=now(), date_modified=now();
+location='', status=1, subtract=$subStock, sort_order=$sort, date_available=now(), date_added=now(), date_modified=now();
 DELETE FROM oc_product_to_store WHERE product_id=$id;
 INSERT INTO oc_product_to_store SET product_id=$id, store_id=0;\n
 SQL;
@@ -143,7 +152,7 @@ SQL;
             foreach ($option as $oid => $vids) {
                 $sql .= "INSERT INTO oc_product_option SET product_option_id=$nextProductOptionId, product_id=$id, option_id=$oid, value='', required=1;\n";
                 foreach ($vids as $vid) {
-                    $sql .= "INSERT INTO oc_product_option_value SET product_option_value_id=$nextProductOptionValueId, product_option_id=$nextProductOptionId, product_id=$id, option_id=$oid, option_value_id=$vid, quantity=1000, subtract=1, price=0, price_prefix='+', points=0, points_prefix='+', weight=0, weight_prefix='+';\n";
+                    $sql .= "INSERT INTO oc_product_option_value SET product_option_value_id=$nextProductOptionValueId, product_option_id=$nextProductOptionId, product_id=$id, option_id=$oid, option_value_id=$vid, quantity=$quantity, subtract=$subStock, price=0, price_prefix='+', points=0, points_prefix='+', weight=0, weight_prefix='+';\n";
                     $nextProductOptionValueId++;
                 }
                 $nextProductOptionId++;
