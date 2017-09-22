@@ -72,6 +72,10 @@ class Convert extends AppBase
         ];
 
         $id = (int)trim($iterator->seek($field['id'])->current());
+        if (!$id) {
+            return '';
+        }
+
         $model = (string)trim($iterator->seek($field['model'])->current());
         $name = htmlentities(trim($iterator->seek($field['name'])->current()), ENT_QUOTES);
         $description = htmlentities(trim($iterator->seek($field['description'])->current()), ENT_QUOTES);
