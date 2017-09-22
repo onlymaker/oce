@@ -57,6 +57,7 @@ class Convert extends AppBase
             'name'        => 'M',
             'description' => 'P',
             'price'       => 'R',
+            'quantity'    => 'S',
             'mainImage'   => 'Y',
             'sort'        => 'AH',
             'images'      => 'AQ',
@@ -71,6 +72,7 @@ class Convert extends AppBase
         $name = htmlentities(trim($iterator->seek($field['name'])->current()), ENT_QUOTES);
         $description = htmlentities(trim($iterator->seek($field['description'])->current()), ENT_QUOTES);
         $price = (float)trim($iterator->seek($field['price'])->current());
+        $quantity = (int)trim($iterator->seek($field['quantity'])->current()) ?? 1000;
         $mainImage = htmlentities(trim($iterator->seek($field['mainImage'])->current()), ENT_QUOTES);
         $sort = (int)trim($iterator->seek($field['sort'])->current());
         $images = htmlentities(trim($iterator->seek($field['images'])->current()), ENT_QUOTES);
@@ -84,7 +86,7 @@ class Convert extends AppBase
 #### $id #####
 DELETE FROM oc_product WHERE product_id=$id;
 INSERT INTO oc_product SET product_id=$id, model='$model', sku='', upc='', ean='', jan='', isbn='', mpn='',
-manufacturer_id=11, shipping=1, price=$price, points=$points, quantity=1000, minimum=1, stock_status_id=6,
+manufacturer_id=11, shipping=1, price=$price, points=$points, quantity=$quantity, minimum=1, stock_status_id=6,
 image='$mainImage', weight=1, weight_class_id=1, length=0, width=0, height=0, length_class_id=1, tax_class_id=0,
 location='', status=1, subtract=1, sort_order=$sort, date_available=now(), date_added=now(), date_modified=now();
 DELETE FROM oc_product_to_store WHERE product_id=$id;
