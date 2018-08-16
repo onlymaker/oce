@@ -84,9 +84,9 @@ SQL;
                     $thumb = '/tmp/' . str_replace('.' . $info['extension'], '_thumb.' . $info['extension'], $info['basename']);
                     if (!file_exists($thumb)) {
                         try{
-                            $img = new \Imagick($image);
+                            $img = new \Gmagick($image);
                             $img->stripimage();
-                            $img->setimagecompressionquality(90);
+                            $img->setCompressionQuality(75);
                             $img->thumbnailimage(100, 100, true);
                             $img->writeimage($thumb);
                             $img->destroy();
