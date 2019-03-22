@@ -4,6 +4,7 @@ namespace app\meta;
 
 use app\common\AppBase;
 use data\Database;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Convert extends AppBase
 {
@@ -32,7 +33,7 @@ class Convert extends AppBase
                 unlink($output);
             }
 
-            $row = \PHPExcel_IOFactory::load($file)->getSheet(0)->getRowIterator(2);
+            $row = IOFactory::load($file)->getSheet(0)->getRowIterator(2);
 
             while ($row->valid()) {
                 file_put_contents($output,

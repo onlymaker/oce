@@ -6,9 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Purl' => array($vendorDir . '/jwage/purl/src'),
     'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
     'Pdp\\' => array($vendorDir . '/jeremykendall/php-domain-parser/library'),
-    'PHPExcel' => array($vendorDir . '/phpoffice/phpexcel/Classes'),
     'Httpful' => array($vendorDir . '/nategood/httpful/src'),
 );

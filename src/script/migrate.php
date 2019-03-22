@@ -9,8 +9,7 @@ ini_set("memory_limit", "1024M");
 define('ROOT', dirname(dirname(__DIR__)));
 define('OUTPUT', '/tmp/migrate.sql');
 
-require_once ROOT . '/vendor/bcosca/fatfree/lib/base.php';
-require_once ROOT . '/vendor/phpoffice/phpexcel/Classes/PHPExcel.php';
+require_once ROOT . '/vendor/autoload.php';
 
 $f3 = Base::instance();
 $f3->config(ROOT . '/src/cfg/system.ini');
@@ -31,7 +30,7 @@ if (file_exists(OUTPUT)) {
     unlink(OUTPUT);
 }
 
-$row = \PHPExcel_IOFactory::load($argv[1])->getSheet(0)->getRowIterator(2);
+$row = \PhpOffice\PhpSpreadsheet\IOFactory::load($argv[1])->getSheet(0)->getRowIterator(2);
 
 while ($row->valid()) {
     file_put_contents(OUTPUT, toSql($row->current()->getCellIterator(), $nextProductOptionId, $nextProductOptionValueId), FILE_APPEND);

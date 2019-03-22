@@ -20,36 +20,32 @@ use ReflectionClass;
 class ClassHasStaticAttribute extends ClassHasAttribute
 {
     /**
-     * Evaluates the constraint for parameter $other. Returns true if the
-     * constraint is met, false otherwise.
-     *
-     * @param mixed $other Value or object to evaluate.
-     *
-     * @return bool
+     * Returns a string representation of the constraint.
      */
-    protected function matches($other)
+    public function toString(): string
     {
-        $class = new ReflectionClass($other);
-
-        if ($class->hasProperty($this->attributeName)) {
-            $attribute = $class->getProperty($this->attributeName);
-
-            return $attribute->isStatic();
-        } else {
-            return false;
-        }
+        return \sprintf(
+            'has static attribute "%s"',
+            $this->attributeName()
+        );
     }
 
     /**
-     * Returns a string representation of the constraint.
+     * Evaluates the constraint for parameter $other. Returns true if the
+     * constraint is met, false otherwise.
      *
-     * @return string
+     * @param mixed $other value or object to evaluate
      */
-    public function toString()
+    protected function matches($other): bool
     {
-        return sprintf(
-            'has static attribute "%s"',
-            $this->attributeName
-        );
+        $class = new ReflectionClass($other);
+
+        if ($class->hasProperty($this->attributeName())) {
+            $attribute = $class->getProperty($this->attributeName());
+
+            return $attribute->isStatic();
+        }
+
+        return false;
     }
 }

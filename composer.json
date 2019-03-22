@@ -1,5 +1,5 @@
 {
-    "name": "syncxplus/php-template",
+    "name": "onlymaker/oce",
     "authors": [
         {
             "name": "jibo",
@@ -8,16 +8,20 @@
     ],
     "license": "Unlicense",
     "require": {
-        "bcosca/fatfree": "3.6.1",
-        "jwage/purl": "0.0.7",
+        "bcosca/fatfree": "dev-3.6.5-syncxplus",
+        "jwage/purl": "0.0.10",
         "nategood/httpful": "0.2.20",
-        "phpoffice/phpexcel": "1.8.1",
-        "ramsey/uuid": "3.6.1"
+        "phpoffice/phpspreadsheet": "^1.6",
+        "ramsey/uuid": "3.8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "6.0.7"
+        "phpunit/phpunit": "^7.0"
     },
     "repositories": {
+        "0": {
+            "type": "vcs",
+            "url": "https://github.com/syncxplus/fatfree"
+        },
         "packagist": {
             "type": "composer",
             "url": "https://packagist.phpcomposer.com"

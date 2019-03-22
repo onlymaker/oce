@@ -15,8 +15,6 @@ use Iterator;
 use PHPUnit\Framework\TestSuite;
 use ReflectionClass;
 
-/**
- */
 class Factory
 {
     /**
@@ -25,14 +23,13 @@ class Factory
     private $filters = [];
 
     /**
-     * @param ReflectionClass $filter
-     * @param mixed           $args
+     * @throws InvalidArgumentException
      */
-    public function addFilter(ReflectionClass $filter, $args)
+    public function addFilter(ReflectionClass $filter, $args): void
     {
         if (!$filter->isSubclassOf(\RecursiveFilterIterator::class)) {
             throw new InvalidArgumentException(
-                sprintf(
+                \sprintf(
                     'Class "%s" does not extend RecursiveFilterIterator',
                     $filter->name
                 )
@@ -42,14 +39,11 @@ class Factory
         $this->filters[] = [$filter, $args];
     }
 
-    /**
-     * @return FilterIterator
-     */
-    public function factory(Iterator $iterator, TestSuite $suite)
+    public function factory(Iterator $iterator, TestSuite $suite): FilterIterator
     {
         foreach ($this->filters as $filter) {
-            list($class, $args) = $filter;
-            $iterator           = $class->newInstance($iterator, $args, $suite);
+            [$class, $args] = $filter;
+            $iterator       = $class->newInstance($iterator, $args, $suite);
         }
 
         return $iterator;

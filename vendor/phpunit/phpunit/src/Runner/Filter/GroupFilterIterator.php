@@ -13,42 +13,30 @@ use PHPUnit\Framework\TestSuite;
 use RecursiveFilterIterator;
 use RecursiveIterator;
 
-/**
- */
 abstract class GroupFilterIterator extends RecursiveFilterIterator
 {
     /**
-     * @var array
+     * @var string[]
      */
     protected $groupTests = [];
 
-    /**
-     * @param RecursiveIterator $iterator
-     * @param array             $groups
-     * @param TestSuite         $suite
-     */
     public function __construct(RecursiveIterator $iterator, array $groups, TestSuite $suite)
     {
         parent::__construct($iterator);
 
         foreach ($suite->getGroupDetails() as $group => $tests) {
-            if (in_array($group, $groups)) {
-                $testHashes = array_map(
-                    function ($test) {
-                        return spl_object_hash($test);
-                    },
+            if (\in_array((string) $group, $groups, true)) {
+                $testHashes = \array_map(
+                    'spl_object_hash',
                     $tests
                 );
 
-                $this->groupTests = array_merge($this->groupTests, $testHashes);
+                $this->groupTests = \array_merge($this->groupTests, $testHashes);
             }
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function accept()
+    public function accept(): bool
     {
         $test = $this->getInnerIterator()->current();
 
@@ -56,8 +44,8 @@ abstract class GroupFilterIterator extends RecursiveFilterIterator
             return true;
         }
 
-        return $this->doAccept(spl_object_hash($test));
+        return $this->doAccept(\spl_object_hash($test));
     }
 
-    abstract protected function doAccept($hash);
+    abstract protected function doAccept(string $hash);
 }

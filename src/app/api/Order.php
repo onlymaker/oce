@@ -3,6 +3,10 @@ namespace app\api;
 
 use data\Database;
 use helper\Bridge;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class Order
 {
@@ -20,14 +24,14 @@ SELECT o.order_id, p.product_id, p.order_product_id, p.model, p.price, p.quantit
 SQL;
             $results = $db->exec($sql);
 
-            $objPHPExcel = new \PHPExcel();
+            $spreadsheet = new Spreadsheet();
 
-            $objPHPExcel->getProperties()->setCreator("Auto Generated")
+            $spreadsheet->getProperties()->setCreator("Auto Generated")
                 ->setTitle("Order Info")
                 ->setSubject("Order Info")
                 ->setDescription("Order Info");
 
-            $objPHPExcel->setActiveSheetIndex(0)
+            $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A1', 'OrderId')
                 ->setCellValue('B1', 'Model')
                 ->setCellValue('C1', 'Product Price')
@@ -51,7 +55,7 @@ SQL;
                 ->setCellValue('U1', 'Option')
                 ->setCellValue('V1', 'Image');
 
-            $iterator = $objPHPExcel->getActiveSheet()->getRowIterator(1);
+            $iterator = $spreadsheet->getActiveSheet()->getRowIterator(1);
 
             foreach ($results as $result) {
                 $options = $db->exec("SELECT product_option_value_id, name, value FROM oc_order_option WHERE order_product_id = ${result['order_product_id']}");
@@ -108,83 +112,83 @@ SQL;
 
                 $iterator->next();
                 $cell = $iterator->current()->getCellIterator();
-                $cell->current()->setValue($result['order_id'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['order_id'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue(isset($model) ? $model : $result['model'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue(isset($model) ? $model : $result['model'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['price'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['price'] * $result['currency_value'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['quantity'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['quantity'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['pt'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['pt'] * $result['currency_value'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['shipping'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['shipping'] * $result['currency_value'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['total'] * $result['currency_value'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['total'] * $result['currency_value'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['currency'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['currency'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['date_added'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['date_added'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['firstname'] . ' ' . $result['lastname'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['firstname'] . ' ' . $result['lastname'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['company'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['company'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['address1'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['address1'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['address2'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['address2'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['country'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['country'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['zone'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['zone'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['city'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['city'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['postcode'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['postcode'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['telephone'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['telephone'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['email'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['email'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue($result['comment'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue($result['comment'])->setDataType(DataType::TYPE_STRING);
                 $cell->next();
-                $cell->current()->setValue(json_encode($options))->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+                $cell->current()->setValue(json_encode($options))->setDataType(DataType::TYPE_STRING);
                 if (isset($thumb) && file_exists($thumb)) {
                     $cell->next();
-                    $objDrawing = new \PHPExcel_Worksheet_Drawing();
+                    $objDrawing = new Drawing();
                     $objDrawing->setPath($thumb);
                     $objDrawing->setHeight(100);
                     $objDrawing->setCoordinates($cell->current()->getCoordinate());
                     $objDrawing->getShadow()->setVisible(true);
-                    $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-                    $objPHPExcel->getActiveSheet()->getRowDimension($iterator->current()->getRowIndex())->setRowHeight(100);
+                    $objDrawing->setWorksheet($spreadsheet->getActiveSheet());
+                    $spreadsheet->getActiveSheet()->getRowDimension($iterator->current()->getRowIndex())->setRowHeight(100);
                 }
             }
 
-            $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setWidth(25);
+            $spreadsheet->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('T')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('U')->setAutoSize(true);
+            $spreadsheet->getActiveSheet()->getColumnDimension('V')->setWidth(25);
 
-            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
 
             $filename = 'order_' . date('Ymd_') . time() . '.xlsx';
 

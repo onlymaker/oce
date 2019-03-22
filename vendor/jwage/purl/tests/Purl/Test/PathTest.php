@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Purl\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Purl\Path;
 
-class PathTest extends PHPUnit_Framework_TestCase
+class PathTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct() : void
     {
         $path = new Path('test');
         $this->assertEquals('test', $path->getPath());
     }
 
-    public function testGetSetPath()
+    public function testGetSetPath() : void
     {
         $path = new Path();
         $this->assertEquals('', $path->getPath());
@@ -21,13 +23,13 @@ class PathTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $path->getPath());
     }
 
-    public function testGetSegments()
+    public function testGetSegments() : void
     {
         $path = new Path('about/me');
-        $this->assertEquals(array('about', 'me'), $path->getSegments());
+        $this->assertEquals(['about', 'me'], $path->getSegments());
     }
 
-    public function testToString()
+    public function testToString() : void
     {
         $path = new Path('about/me');
         $this->assertEquals('about/me', (string) $path);

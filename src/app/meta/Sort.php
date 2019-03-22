@@ -4,6 +4,9 @@ namespace app\meta;
 
 use app\common\AppBase;
 use data\Database;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class Sort extends AppBase
 {
@@ -17,7 +20,7 @@ class Sort extends AppBase
     {
         $results = $this->db->exec("SELECT model, sort_order FROM oc_product WHERE sort_order != 1000");
 
-        $excel = new \PHPExcel();
+        $excel = new Spreadsheet();
 
         $excel->getProperties()->setCreator("Auto Generated")
             ->setTitle("Product Sort Order")
@@ -33,15 +36,15 @@ class Sort extends AppBase
         foreach ($results as $result) {
             $iterator->next();
             $cell = $iterator->current()->getCellIterator();
-            $cell->current()->setValue($result['model'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+            $cell->current()->setValue($result['model'])->setDataType(DataType::TYPE_STRING);
             $cell->next();
-            $cell->current()->setValue($result['sort_order'])->setDataType(\PHPExcel_Cell_DataType::TYPE_STRING);
+            $cell->current()->setValue($result['sort_order'])->setDataType(DataType::TYPE_STRING);
         }
 
         $excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
         $excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
 
-        $objWriter = \PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $objWriter = IOFactory::createWriter($excel, 'Xlsx');
 
         $filename = 'product_sort_download_' . date('Ymd_') . time() . '.xlsx';
 
@@ -59,7 +62,7 @@ class Sort extends AppBase
             file_put_contents($file, file_get_contents($_FILES['sort']['tmp_name']));
 
             try {
-                $excel = \PHPExcel_IOFactory::load($file);
+                $excel = IOFactory::load($file);
 
                 $sheet = $excel->getSheet(0);
 
